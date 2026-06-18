@@ -1,0 +1,27 @@
+name: Daily Price Scraper
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Runs daily at 8:30 AM IST
+  workflow_dispatch:      # Also allows manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Run scraper
+        run: python amazon_test.py
+      - name: Commit updated prices
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add price_history.json
+          git commit -m "Auto: daily price update $(date +%Y-%m-%d)" || echo "No changes"
+          git push
