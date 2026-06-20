@@ -1,0 +1,50 @@
+[
+  {
+    "name": "iPhone 13 128GB",
+    "price": "59,900.",
+    "date": "2026-06-20",
+    "url": "https://www.amazon.in/Apple-iPhone-13-128GB-Midnight/dp/B09G9HD6PD"
+  },
+  {
+    "name": "Samsung Galaxy S23",
+    "price": "99,999.",
+    "date": "2026-06-20",
+    "url": "https://www.amazon.in/Samsung-Galaxy-S23-Phantom-Storage/dp/B0BT9CXXXX"
+  },
+  {
+    "name": "REDTIGER F17 Dash Cam",
+    "price": "29,999.",
+    "date": "2026-06-20",
+    "url": "https://www.amazon.in/REDTIGER-F17-Elite-Channel-STARVIS/dp/B0F8NNYZPV"
+  },
+  {
+    "name": "Lifelong ZenCharge Power Bank",
+    "price": "1,889.",
+    "date": "2026-06-20",
+    "url": "https://www.amazon.in/Lifelong-ZenCharge-Compact-Lithium-Charging/dp/B0D5HTDWSC"
+  },
+  {
+    "name": "boAt EnergyShroom 10000mAh",
+    "price": "1,699.",
+    "date": "2026-06-20",
+    "url": "https://www.amazon.in/boAt-EnergyShroom-10000mAh-Magnetic-Powerbank/dp/B0F4XRZ81C"
+  },
+  {
+    "name": "boAt Airdopes Earphones",
+    "price": "2,199.",
+    "date": "2026-06-20",
+    "url": "https://www.amazon.in/boAt-Airdopes-Multidevice-Bluetooth-Earphones/dp/B0F8BVYRWS"
+  },
+  {
+    "name": "Noise Wireless Earbuds",
+    "price": "2,499.",
+    "date": "2026-06-20",
+    "url": "https://www.amazon.in/Noise-Launched-Wireless-AirWaveTM-Technology/dp/B0DGV56J6G"
+  },
+  {
+    "name": "Apple iPad Air 11 inch",
+    "price": "61,699.",
+    "date": "2026-06-20",
+    "url": "https://www.amazon.in/Apple-iPad-Air-27-59-11/dp/B0GQVHBK9M"
+  }
+]
