@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PriceSpy — Discount Investigation Unit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEAE0;
+    --paper-dark:#E3DCCB;
+    --ink:#1A1815;
+    --ink-soft:#5B5650;
+    --red:#C1432E;
+    --green:#3D6B4F;
+    --line:#1A1815;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Archivo',sans-serif;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
+
+  header{border-bottom:3px solid var(--line);padding:28px 0 18px;}
+  .masthead{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;}
+  .logo{font-family:'Archivo Black',sans-serif;font-size:clamp(32px,6vw,52px);letter-spacing:-0.02em;line-height:1;}
+  .logo span{color:var(--red);}
+  .meta-line{font-family:'JetBrains Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-soft);text-align:right;}
+  .meta-line .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:6px;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+  .subhead{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink-soft);margin-top:6px;}
+
+  /* ===== SEARCH BAR ===== */
+  .search-section{padding:32px 0;border-bottom:3px solid var(--line);}
+  .search-form{display:flex;gap:0;}
+  .search-input{
+    flex:1;
+    font-family:'JetBrains Mono',monospace;
+    font-size:16px;
+    padding:16px 18px;
+    border:2px solid var(--ink);
+    border-right:none;
+    background:var(--paper);
+    color:var(--ink);
+    outline:none;
+  }
+  .search-input::placeholder{color:var(--ink-soft);}
+  .search-btn{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    font-size:14px;
+    padding:16px 28px;
+    background:var(--ink);
+    color:var(--paper);
+    border:2px solid var(--ink);
+    cursor:pointer;
+    transition:background 0.15s ease;
+  }
+  .search-btn:hover{background:var(--red);border-color:var(--red);}
+  .search-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .search-hint{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:10px;
+  }
+
+  /* ===== STATUS ===== */
+  .status{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    padding:24px 0 0;
+    display:none;
+  }
+  .status.show{display:block;}
+  .status .dots::after{
+    content:'';
+    display:inline-block;
+    animation:dots 1.4s infinite;
+  }
+  @keyframes dots{
+    0%{content:'';}25%{content:'.';}50%{content:'..';}75%{content:'...';}
+  }
+
+  /* ===== RESULTS GRID ===== */
+  .section-label{
+    font-family:'JetBrains Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:0.1em;
+    color:var(--ink-soft);margin:36px 0 16px;display:flex;align-items:center;gap:10px;
+  }
+  .section-label::after{content:'';flex:1;height:1px;background:var(--ink-soft);opacity:0.4;}
+
+  .grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
+    gap:0;border-top:1px solid var(--ink);border-left:1px solid var(--ink);
+  }
+  .card{
+    border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);
+    padding:22px;position:relative;background:var(--paper);transition:background 0.15s ease;
+  }
+  .card:hover{background:var(--paper-dark);}
+  .card-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);letter-spacing:0.05em;}
+  .card-name{
+    font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;margin:8px 0 14px;
+    line-height:1.3;min-height:58px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+  .price-now{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:24px;}
+  .price-mrp{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink-soft);text-decoration:line-through;}
+  .discount-tag{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red);font-weight:700;}
+
+  .verdict{
+    display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;
+    letter-spacing:0.08em;padding:5px 10px;border:2px solid currentColor;transform:rotate(-2deg);
+    text-transform:uppercase;margin-top:8px;
+  }
+  .verdict.tracking{color:var(--ink-soft);border-color:var(--ink-soft);}
+  .verdict.real{color:var(--green);}
+  .verdict.fake{color:var(--red);}
+
+  .card-footer{
+    margin-top:16px;padding-top:12px;border-top:1px dashed var(--ink-soft);
+    display:flex;justify-content:flex-end;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);
+  }
+  .card-footer a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink);}
+  .card-footer a:hover{color:var(--red);border-color:var(--red);}
+
+  .empty-state{
+    padding:48px 24px;text-align:center;font-family:'JetBrains Mono',monospace;
+    color:var(--ink-soft);font-size:13px;border:1px dashed var(--ink-soft);margin-top:24px;
+  }
+  .error-state{
+    padding:24px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--red);
+    border:2px solid var(--red);margin-top:24px;
+  }
+
+  .method{margin-top:48px;padding:24px 0 48px;border-top:3px solid var(--line);}
+  .method h3{font-family:'Archivo Black',sans-serif;font-size:20px;margin-bottom:10px;}
+  .method p{font-family:'Archivo',sans-serif;font-size:14.5px;line-height:1.6;color:var(--ink-soft);max-width:680px;}
+  .method code{font-family:'JetBrains Mono',monospace;background:var(--paper-dark);padding:1px 5px;font-size:13px;}
+
+  footer{
+    border-top:1px solid var(--ink-soft);padding:16px 0 32px;font-family:'JetBrains Mono',monospace;
+    font-size:11px;color:var(--ink-soft);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  }
+
+  @media (max-width:640px){
+    .search-form{flex-direction:column;}
+    .search-input{border-right:2px solid var(--ink);}
+    .search-btn{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="masthead">
+      <div class="logo">PRICE<span>SPY</span></div>
+      <div class="meta-line"><span class="live-dot"></span>LIVE SEARCH ENGINE</div>
+    </div>
+    <div class="subhead">// search any product on amazon.in and we'll flag whether the discount looks real</div>
+  </header>
+
+  <div class="search-section">
+    <form class="search-form" id="searchForm">
+      <input
+        type="text"
+        class="search-input"
+        id="searchInput"
+        placeholder="e.g. iPhone 15, running shoes, air fryer..."
+        autocomplete="off"
+      >
+      <button type="submit" class="search-btn" id="searchBtn">Investigate</button>
+    </form>
+    <div class="search-hint">Live results pulled directly from Amazon.in — takes 5–10 seconds per search</div>
+  </div>
+
+  <div class="status" id="status">
+    <span class="dots">Searching Amazon.in</span>
+  </div>
+
+  <div id="resultsContainer"></div>
+
+  <div class="method">
+    <h3>How a verdict is reached</h3>
+    <p>
+      For every result, PriceSpy compares the listed price against the original MRP shown on the same page.
+      A claimed discount under <code>15%</code> is treated as <strong>modest</strong> — too small to judge.
+      Between <code>15–40%</code> it's marked <strong>Likely Real</strong>. Above <code>40%</code>, the discount
+      gets flagged as <strong>Verify Before Buying</strong> — large claimed discounts are the most commonly
+      inflated kind, where the "original price" was never really the selling price.
+    </p>
+  </div>
+
+  <footer>
+    <span>PRICESPY © 2026 — STUDENT PROJECT, PCCOE</span>
+    <span>DATA SOURCE: AMAZON.IN VIA SCRAPERAPI</span>
+  </footer>
+</div>
+
+<script>
+  // ⚠️ Replace this with your actual Render.com backend URL once deployed
+  const BACKEND_URL = "https://pricespy-wzx4.onrender.com";
+
+  const form = document.getElementById('searchForm');
+  const input = document.getElementById('searchInput');
+  const btn = document.getElementById('searchBtn');
+  const status = document.getElementById('status');
+  const container = document.getElementById('resultsContainer');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const query = input.value.trim();
+    if (!query) return;
+
+    btn.disabled = true;
+    status.classList.add('show');
+    container.innerHTML = '';
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/search?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      renderResults(data.results, query);
+    } catch (err) {
+      container.innerHTML = `
+        <div class="error-state">
+          Could not complete search: ${err.message}<br>
+          (If this is your first search after deploying, the backend may be waking up — try again in 20 seconds.)
+        </div>
+      `;
+    } finally {
+      btn.disabled = false;
+      status.classList.remove('show');
+    }
+  });
+
+  function renderResults(results, query){
+    if(!results || results.length === 0){
+      container.innerHTML = `<div class="empty-state">No results found for "${query}". Try a different search term.</div>`;
+      return;
+    }
+
+    let html = `<div class="section-label">Results for "${query}"</div><div class="grid">`;
+
+    results.forEach((item, i) => {
+      const discountText = item.discount_pct
+        ? `${item.discount_pct}% off claimed`
+        : '';
+
+      html += `
+        <div class="card">
+          <div class="card-num">RESULT №${String(i+1).padStart(3,'0')}</div>
+          <div class="card-name">${item.name}</div>
+          <div class="price-row">
+            <span class="price-now">₹${item.price.toLocaleString('en-IN')}</span>
+            ${item.mrp ? `<span class="price-mrp">₹${item.mrp.toLocaleString('en-IN')}</span>` : ''}
+          </div>
+          ${discountText ? `<div class="discount-tag">${discountText}</div>` : ''}
+          <div class="verdict ${item.verdict_class}">${item.verdict}</div>
+          <div class="card-footer">
+            <a href="${item.url}" target="_blank" rel="noopener">VIEW ON AMAZON →</a>
+          </div>
+        </div>
+      `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+  }
+</script>
+
+</body>
+</html>
